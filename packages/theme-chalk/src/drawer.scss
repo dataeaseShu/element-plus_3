@@ -1,0 +1,175 @@
+@use 'mixins/mixins' as *;
+@use 'mixins/var' as *;
+@use 'common/var' as *;
+
+$directions: rtl, ltr, ttb, btt;
+
+@include b(drawer) {
+  @include set-component-css-var('drawer', $drawer);
+}
+
+@include b(drawer) {
+  position: absolute;
+  box-sizing: border-box;
+  background-color: getCssVar('drawer', 'bg-color');
+  display: flex;
+  flex-direction: column;
+  box-shadow: getCssVar('box-shadow', 'dark');
+  overflow: hidden;
+
+  transition: all getCssVar('transition-duration');
+
+  @each $direction in $directions {
+    .#{$direction} {
+      transform: translate(0, 0);
+    }
+  }
+
+  &__sr-focus:focus {
+    outline: none !important;
+  }
+
+  &__header {
+    align-items: center;
+    color: #1f2329;
+    display: flex;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+    height: 57px;
+    padding: 16px 24px;
+    border-bottom: 1px solid #1F232926;
+    & > :first-child {
+      flex: 1;
+    }
+  }
+
+  &__title {
+    margin: 0;
+    flex: 1;
+    line-height: inherit;
+    font-size: 16px;
+  }
+
+  @include e(footer) {
+    text-align: right;
+    padding: 16px 24px;
+    height: 64px;
+    box-shadow: 0 -1px 4px #0000000d;
+    position: absolute;
+    z-index: 5;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #fff;
+  }
+
+  &__close-btn {
+    position: absolute;
+    top: 14px;
+    right: 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: inherit;
+    width: 28px;
+    height: 28px;
+    border-radius: 4px;
+    padding: 4px;
+    background-color: transparent;
+    outline: none;
+    color: #646a73;
+
+    &:focus,
+    &:hover {
+      background: rgba(31, 35, 41, 0.1);
+    }
+    &:active {
+      background: rgba(31, 35, 41, 0.2);
+    }
+  }
+
+  &__body {
+    flex: 1;
+    padding: 16px 24px 80px;
+    overflow: auto;
+    & > * {
+      box-sizing: border-box;
+    }
+  }
+
+  &.ltr,
+  &.rtl {
+    height: 100%;
+    top: 0;
+    bottom: 0;
+  }
+
+  &.ttb,
+  &.btt {
+    width: 100%;
+    left: 0;
+    right: 0;
+  }
+
+  &.ltr {
+    left: 0;
+  }
+
+  &.rtl {
+    right: 0;
+  }
+
+  &.ttb {
+    top: 0;
+  }
+
+  &.btt {
+    bottom: 0;
+  }
+}
+
+.#{$namespace}-drawer-fade {
+  &-enter-active,
+  &-leave-active {
+    transition: all getCssVar('transition-duration');
+  }
+
+  &-enter-from,
+  &-enter-active,
+  &-enter-to,
+  &-leave-from,
+  &-leave-active,
+  &-leave-to {
+    overflow: hidden !important;
+  }
+
+  &-enter-from,
+  &-leave-to {
+    background-color: transparent !important;
+  }
+
+  &-enter-from,
+  &-leave-to {
+    @each $direction in $directions {
+      .#{$direction} {
+        @if $direction == ltr {
+          transform: translateX(-100%);
+        }
+
+        @if $direction == rtl {
+          transform: translateX(100%);
+        }
+
+        @if $direction == ttb {
+          transform: translateY(-100%);
+        }
+
+        @if $direction == btt {
+          transform: translateY(100%);
+        }
+      }
+    }
+  }
+}

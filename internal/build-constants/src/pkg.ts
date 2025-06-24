@@ -1,0 +1,5 @@
+export const PKG_PREFIX = '@element-plus'
+export const PKG_NAME = 'element-plus-secondary'
+export const PKG_CAMELCASE_NAME = 'ElementPlusSecondary'
+export const PKG_CAMELCASE_LOCAL_NAME = 'ElementPlusLocale'
+export const PKG_BRAND_NAME = 'Element Plus Secondary'

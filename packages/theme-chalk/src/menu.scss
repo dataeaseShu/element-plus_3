@@ -1,0 +1,446 @@
+@use 'mixins/mixins' as *;
+@use 'mixins/var' as *;
+@use 'mixins/utils' as *;
+@use 'common/var' as *;
+@use 'common/transition';
+
+$checked-icon: "data:image/svg+xml;utf8,%3Csvg class='icon' width='16' height='16' viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='currentColor' d='M6.14507 11.6065L13.4518 4.29978C13.582 4.1696 13.7931 4.1696 13.9232 4.29978L14.3946 4.77118C14.5248 4.90136 14.5248 5.11241 14.3946 5.24259L6.38077 13.2565C6.25059 13.3866 6.03954 13.3866 5.90936 13.2565L1.66672 9.01382C1.53655 8.88365 1.53655 8.67259 1.66672 8.54242L2.13813 8.07102C2.2683 7.94084 2.47936 7.94084 2.60953 8.07102L6.14507 11.6065Z'%3E%3C/path%3E%3C/svg%3E";
+@mixin checked-icon {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  border-top: none;
+  border-right: none;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: getCssVar('color-primary');
+  mask: url('#{$checked-icon}') no-repeat;
+  mask-size: 100% 100%;
+  -webkit-mask: url('#{$checked-icon}') no-repeat;
+  -webkit-mask-size: 100% 100%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+}
+@mixin menu-item {
+  display: flex;
+  align-items: center;
+  height: getCssVar('menu-item-height');
+  line-height: getCssVar('menu-item-height');
+  font-size: getCssVar('menu-item-font-size');
+  color: #FFFFFFCC;
+  padding: 0 getCssVar('menu-base-level-padding');
+  list-style: none;
+  cursor: pointer;
+  position: relative;
+  transition: border-color getCssVar('transition-duration'),
+    background-color getCssVar('transition-duration'),
+    color getCssVar('transition-duration');
+  box-sizing: border-box;
+  white-space: nowrap;
+
+  * {
+    vertical-align: bottom;
+  }
+
+  i {
+    color: inherit;
+  }
+
+  &:hover,
+  &:focus {
+    outline: none;
+  }
+
+  &:hover {
+    background-color: #ffffff1a;
+  }
+
+  @include when(disabled) {
+    opacity: 0.25;
+    cursor: not-allowed;
+    background: none !important;
+  }
+}
+
+:root {
+  // They are defined on :root so they can be inherited by sub-menu instead of overwritten
+  @include set-component-css-var('menu', $menu);
+}
+
+@include b(menu) {
+  border-right: solid 1px getCssVar('menu-border-color');
+  list-style: none;
+  position: relative;
+  margin: 0;
+  padding-left: 0;
+  background-color: getCssVar('menu-bg-color');
+  box-sizing: border-box;
+
+  @include m(vertical) {
+    &:not(.#{$namespace}-menu--collapse):not(.#{$namespace}-menu--popup-container) {
+      & .#{$namespace}-menu-item,
+      & .#{$namespace}-sub-menu__title,
+      & .#{$namespace}-menu-item-group__title {
+        white-space: nowrap;
+        padding-left: calc(
+          #{getCssVar('menu-base-level-padding')} + 4px + #{getCssVar('menu-level')} *
+            #{getCssVar('menu-level-padding')}
+        );
+      }
+    }
+
+    &.#{$namespace}-menu--light {
+      & .#{$namespace}-menu-item {
+        color: #1f2329;
+        height: 48px;
+      }
+      & .#{$namespace}-menu-item:not(.is-disabled):hover {
+        color: #1f2329;
+        background-color: #1f23291a;
+      }
+  
+      & > .#{$namespace}-sub-menu {
+        & .#{$namespace}-sub-menu__title {
+          color: #1f2329;
+  
+          &:hover {
+            color: #1f2329;
+            background-color: #1f23291a;
+          }
+        }
+      }
+
+      .#{$namespace}-menu-item.is-active.is-active.is-active {
+        background-color: #3370ff1a;
+        color:  getCssVar('color-primary');
+      }
+    }
+
+    .#{$namespace}-menu--popup {
+      .#{$namespace}-menu-item {
+        height: 48px;
+        color: #1F2329;
+      }
+
+      .#{$namespace}-menu-item.is-active.is-active {
+        color: getCssVar('color-primary');
+        background-color: #3370FF1A;
+        &::after {
+          display: none;
+        }
+      }
+    }
+  }
+
+  &:not(.#{$namespace}-menu--collapse) .#{$namespace}-sub-menu__title {
+    padding-right: calc(
+      #{getCssVar('menu-base-level-padding')} + #{getCssVar('menu-icon-width')}
+    );
+  }
+
+  @include m(horizontal) {
+    display: flex;
+    flex-wrap: nowrap;
+    border-right: none;
+
+    height: getCssVar('menu-horizontal-height');
+    // reset menu-item popup height
+    &.#{$namespace}-menu--popup-container {
+      height: unset;
+    }
+
+    &.#{$namespace}-menu {
+      border-bottom: solid 1px getCssVar('menu-border-color');
+    }
+
+    & > .#{$namespace}-menu-item {
+      display: inline-flex;
+      justify-content: center;
+      align-items: center;
+
+      height: 100%;
+      margin: 0;
+      color: #FFFFFFCC;
+
+      a,
+      a:hover {
+        color: inherit;
+      }
+    }
+    & > .#{$namespace}-sub-menu {
+      &:focus,
+      &:hover {
+        outline: none;
+      }
+
+      &:hover {
+        .#{$namespace}-sub-menu__title {
+          color: getCssVar('menu-hover-text-color');
+        }
+      }
+
+      &.is-active.is-active {
+        .#{$namespace}-sub-menu__title {
+          color: #FFFFFF;
+          background-color: getCssVar('color-primary');
+        }
+
+        .#{$namespace}-sub-menu__icon-arrow {
+          color: #FFFFFFCC;
+        }
+      }
+
+      & .#{$namespace}-sub-menu__title {
+        height: 100%;
+        color: #FFFFFFCC;
+
+        &:hover {
+          color: #FFFFFF;
+          background-color: #ffffff1a;
+        }
+      }
+    }
+    & .#{$namespace}-menu {
+      & .#{$namespace}-menu-item,
+      & .#{$namespace}-sub-menu__title {
+        background-color: getCssVar('menu-bg-color');
+        display: flex;
+        align-items: center;
+        height: getCssVar('menu-horizontal-sub-item-height');
+        line-height: getCssVar('menu-horizontal-sub-item-height');
+        padding: 0 11px;
+        color: getCssVar('menu-text-color');
+      }
+
+      & .#{$namespace}-sub-menu__title {
+        padding-right: 40px;
+      }
+
+      & .#{$namespace}-menu-item.is-active,
+      & .#{$namespace}-sub-menu.is-active > .#{$namespace}-sub-menu__title {
+        color: getCssVar('menu-active-color');
+      }
+    }
+    & .#{$namespace}-menu-item:not(.is-disabled):hover,
+    &.#{$namespace}-menu--dark .#{$namespace}-menu-item:not(.is-disabled):focus {
+      outline: none;
+      color: #fff;
+      background-color: #ffffff1a;
+    }
+    & > .#{$namespace}-menu-item.is-active.is-active.is-active {
+      background-color: getCssVar('color-primary');
+      color: #fff;
+    }
+  }
+
+  @include m(light) {
+    & .#{$namespace}-menu-item {
+      color: #1f2329;
+    }
+    & .#{$namespace}-menu-item:not(.is-disabled):hover {
+      color: #1f2329;
+      background-color: #1f23291a;
+    }
+
+    & > .#{$namespace}-sub-menu {
+      & .#{$namespace}-sub-menu__title {
+        color: #1f2329;
+
+        &:hover {
+          color: #1f2329;
+          background-color: #1f23291a;
+        }
+      }
+    }
+
+  }
+  @include m(collapse) {
+    width: calc(
+      #{getCssVar('menu-icon-width')} + #{getCssVar('menu-base-level-padding')} *
+        2 - 3px
+    );
+
+    > .#{$namespace}-menu-item,
+    > .#{$namespace}-sub-menu > .#{$namespace}-sub-menu__title,
+    > .#{$namespace}-menu-item-group
+      > ul
+      > .#{$namespace}-sub-menu
+      > .#{$namespace}-sub-menu__title {
+      [class^='#{$namespace}-icon'] {
+        margin: 0;
+        vertical-align: middle;
+        width: getCssVar('menu-icon-width');
+        text-align: center;
+      }
+
+      .#{$namespace}-sub-menu__icon-arrow {
+        display: none;
+      }
+
+      > span {
+        height: 0;
+        width: 0;
+        overflow: hidden;
+        visibility: hidden;
+        display: inline-block;
+      }
+    }
+
+    > .#{$namespace}-menu-item.is-active i {
+      color: inherit;
+    }
+
+    .#{$namespace}-menu .#{$namespace}-sub-menu {
+      min-width: 200px;
+    }
+
+    .#{$namespace}-sub-menu {
+      &.is-active.is-active.is-active .#{$namespace}-sub-menu__title {
+        color: getCssVar('menu-active-color');
+        background-color: #3370FF1A;
+      }
+    }
+  }
+  @include m(popup) {
+    z-index: 100;
+    min-width: 200px;
+    border: none;
+    padding: 8px 0;
+    border-radius: getCssVar('border-radius-small');
+    box-shadow: getCssVar('box-shadow-light');
+    
+
+    .#{$namespace}-menu-item:not(.is-disabled):hover{
+      outline: none;
+      color: #1F2329;
+      background-color: #1F23291A;
+    }
+
+    .#{$namespace}-menu-item:not(.is-disabled):focus {
+      color: #1F2329;
+      background-color:transparent;
+    }
+
+    .#{$namespace}-menu-item.is-active.is-active {
+      color: getCssVar('color-primary');
+      background-color: #1F23291A;
+      &::after {
+        @include checked-icon;
+      }
+    }
+  }
+
+  .#{$namespace}-icon {
+    flex-shrink: 0;
+  }
+}
+
+@include b(menu-item) {
+  @include menu-item;
+
+  & [class^='#{$namespace}-icon'] {
+    margin-right: 8px;
+    width: getCssVar('menu-icon-width');
+    text-align: center;
+    font-size: 20px;
+    vertical-align: middle;
+  }
+  @include when(active) {
+    color: getCssVar('menu-active-color');
+    i {
+      color: inherit;
+    }
+  }
+  .#{$namespace}-menu-tooltip__trigger {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+    padding: 0 getCssVar('menu-base-level-padding');
+  }
+}
+
+@include b(sub-menu) {
+  list-style: none;
+  margin: 0;
+  padding-left: 0;
+
+  @include e(title) {
+    @include menu-item;
+
+    &:hover {
+      background-color: getCssVar('menu-hover-bg-color');
+    }
+  }
+  & .#{$namespace}-menu {
+    border: none;
+  }
+  & .#{$namespace}-menu-item {
+    height: getCssVar('menu-sub-item-height');
+    line-height: getCssVar('menu-sub-item-height');
+  }
+  @include e(hide-arrow) {
+    .#{$namespace}-sub-menu__icon-arrow {
+      display: none !important;
+    }
+  }
+  @include when(active) {
+    .#{$namespace}-sub-menu__title {
+      border-bottom-color: getCssVar('menu-active-color');
+    }
+  }
+  @include when(disabled) {
+    .#{$namespace}-sub-menu__title,
+    .#{$namespace}-menu-item {
+      opacity: 0.25;
+      cursor: not-allowed;
+      background: none !important;
+    }
+  }
+  .#{$namespace}-icon {
+    vertical-align: middle;
+    margin-right: 5px;
+    width: getCssVar('menu-icon-width');
+    text-align: center;
+    font-size: 18px;
+
+    &.#{$namespace}-sub-menu__icon-more {
+      margin-right: 0 !important;
+    }
+  }
+  .#{$namespace}-sub-menu__icon-arrow {
+    position: absolute;
+    top: 50%;
+    right: getCssVar('menu-base-level-padding');
+    margin-top: -6px;
+    transition: transform getCssVar('transition-duration');
+    font-size: 12px;
+    margin-right: 0;
+    width: inherit;
+  }
+}
+
+@include b(menu-item-group) {
+  > ul {
+    padding: 0;
+  }
+  @include e(title) {
+    padding: 7px 0 7px getCssVar('menu-base-level-padding');
+    line-height: normal;
+    font-size: 12px;
+    color: getCssVar('text-color', 'secondary');
+  }
+}
+
+.horizontal-collapse-transition
+  .#{$namespace}-sub-menu__title
+  .#{$namespace}-sub-menu__icon-arrow {
+  transition: getCssVar('transition-duration-fast');
+  opacity: 0;
+}

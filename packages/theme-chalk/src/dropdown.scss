@@ -1,0 +1,237 @@
+@use 'sass:map';
+
+@use 'mixins/mixins' as *;
+@use 'mixins/var' as *;
+@use 'common/var' as *;
+
+$dropdown-item-line-height: () !default;
+$dropdown-item-line-height: map.merge(
+  (
+    'large': 22px,
+    'default': 22px,
+    'small': 20px,
+  ),
+  $dropdown-item-line-height
+);
+
+$dropdown-item-padding: () !default;
+$dropdown-item-padding: map.merge(
+  (
+    'large': 7px 20px,
+    'default': 5px 16px,
+    'small': 2px 12px,
+  ),
+  $dropdown-item-padding
+);
+
+$dropdown-item-divided-margin: () !default;
+$dropdown-item-divided-margin: map.merge(
+  (
+    'large': 8px 0,
+    'default': 6px 0,
+    'small': 4px 0,
+  ),
+  $dropdown-item-divided-margin
+);
+
+$dropdown-caret-width: () !default;
+$dropdown-caret-width: map.merge($common-component-size, $dropdown-caret-width);
+
+$dropdown-divider-width: 1px !default;
+
+$checked-icon: "data:image/svg+xml;utf8,%3Csvg class='icon' width='16' height='16' viewBox='0 0 16 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath fill='currentColor' d='M6.14507 11.6065L13.4518 4.29978C13.582 4.1696 13.7931 4.1696 13.9232 4.29978L14.3946 4.77118C14.5248 4.90136 14.5248 5.11241 14.3946 5.24259L6.38077 13.2565C6.25059 13.3866 6.03954 13.3866 5.90936 13.2565L1.66672 9.01382C1.53655 8.88365 1.53655 8.67259 1.66672 8.54242L2.13813 8.07102C2.2683 7.94084 2.47936 7.94084 2.60953 8.07102L6.14507 11.6065Z'%3E%3C/path%3E%3C/svg%3E";
+@mixin checked-icon {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  border-top: none;
+  border-right: none;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: map.get($select-option, 'selected-text-color');
+  mask: url('#{$checked-icon}') no-repeat;
+  mask-size: 100% 100%;
+  -webkit-mask: url('#{$checked-icon}') no-repeat;
+  -webkit-mask-size: 100% 100%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+}
+
+@include b(dropdown) {
+  @include set-component-css-var('dropdown', $dropdown);
+
+  display: inline-flex;
+  position: relative;
+  color: getCssVar('text-color', 'regular');
+  font-size: getCssVar('font-size', 'base');
+  line-height: 1;
+  vertical-align: top;
+
+  &.is-disabled {
+    color: getCssVar('text-color', 'placeholder');
+    cursor: not-allowed;
+  }
+
+  @include e(popper) {
+    @include set-component-css-var('dropdown', $dropdown);
+
+    // using attributes selector to override
+
+    @include picker-popper(
+      getCssVar('bg-color', 'overlay'),
+      1px solid getCssVar('border-color-light'),
+      getCssVar('dropdown-menu-box-shadow')
+    );
+
+    .#{$namespace}-dropdown-menu {
+      border: none;
+    }
+
+    #{& + '-selfdefine'} {
+      outline: none;
+    }
+
+    @include b(scrollbar__bar) {
+      z-index: calc(#{getCssVar('dropdown', 'menu-index')} + 1);
+    }
+
+    @include b(dropdown__list) {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+  }
+
+  & .#{$namespace}-dropdown__caret-button {
+    padding-left: 0;
+    padding-right: 0;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: map.get($dropdown-caret-width, 'default');
+    border-left: none;
+
+    > span {
+      display: inline-flex;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      display: block;
+      width: 1px;
+      top: -1px;
+      bottom: -1px;
+      left: 0;
+      background: getCssVar('overlay-color', 'lighter');
+    }
+
+    &.#{$namespace}-button::before {
+      background: getCssVar('border-color');
+      opacity: 0.5;
+    }
+
+    & .#{$namespace}-dropdown__icon {
+      font-size: inherit;
+      padding-left: 0;
+    }
+  }
+
+  .#{$namespace}-dropdown-selfdefine {
+    // 自定义
+    outline: none;
+  }
+
+  @each $size in (large, small) {
+    @include m($size) {
+      .#{$namespace}-dropdown__caret-button {
+        width: map.get($dropdown-caret-width, $size);
+      }
+    }
+  }
+}
+
+$dropdown-menu-padding-vertical: () !default;
+$dropdown-menu-padding-vertical: map.merge(
+  (
+    'large': 8px,
+    'default': 6px,
+    'small': 4px,
+  ),
+  $dropdown-menu-padding-vertical
+);
+
+@include b(dropdown-menu) {
+  position: relative;
+  top: 0;
+  left: 0;
+  z-index: getCssVar('dropdown-menu-index');
+  padding: map.get($dropdown-menu-padding-vertical, 'default')-$border-width 0;
+  margin: 0;
+  background-color: getCssVar('bg-color', 'overlay');
+  border: none;
+  border-radius: getCssVar('border-radius-base');
+  box-shadow: none;
+  list-style: none;
+
+  @include e(item) {
+    display: flex;
+    align-items: center;
+    position: relative;
+    white-space: nowrap;
+    list-style: none;
+    line-height: map.get($dropdown-item-line-height, 'default');
+    padding: map.get($dropdown-item-padding, 'default');
+    margin: 0;
+    font-size: getCssVar('font-size', 'base');
+    color: getCssVar('text-color', 'regular');
+    cursor: pointer;
+    outline: none;
+    &:not(.is-disabled):hover,
+    &:not(.is-disabled):focus {
+      background-color: getCssVar('dropdown-menuItem-hover-fill');
+      color: getCssVar('dropdown-menuItem-hover-color');
+    }
+
+    i {
+      margin-right: 5px;
+    }
+
+    @include m(divided) {
+      margin: map.get($dropdown-item-divided-margin, 'default');
+      border-top: 1px solid getCssVar('border-color-lighter');
+    }
+
+    @include when(disabled) {
+      cursor: not-allowed;
+      color: getCssVar('text-color-disabled');
+    }
+
+    &.selected {
+      padding-right: 30px;
+      color: getCssVar('color-primary');
+      &::after {
+        @include checked-icon;
+      }
+    }
+  }
+
+  @each $size in (large, small) {
+    @include m($size) {
+      padding: map.get($dropdown-menu-padding-vertical, $size)-$border-width 0;
+
+      @include e(item) {
+        padding: map.get($dropdown-item-padding, $size);
+        line-height: map.get($dropdown-item-line-height, $size);
+        font-size: map.get($input-font-size, $size);
+
+        @include m(divided) {
+          margin: map.get($dropdown-item-divided-margin, $size);
+        }
+      }
+    }
+  }
+}

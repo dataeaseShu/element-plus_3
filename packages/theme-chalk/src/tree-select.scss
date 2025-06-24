@@ -1,0 +1,62 @@
+@use 'mixins/mixins' as *;
+@use 'mixins/var' as *;
+@use 'common/var' as *;
+
+@include b(tree-select) {
+  @include set-component-css-var('tree', $tree);
+}
+
+@include b(tree-select) {
+  @include e(popper) {
+    // padding-left same with select option
+    .#{$namespace}-tree-node__expand-icon {
+      margin-left: 8px;
+    }
+
+    // remove icon when show checkbox
+    .#{$namespace}-tree-node.is-checked
+      > .#{$namespace}-tree-node__content
+      .#{$namespace}-select-dropdown__item.selected::after {
+      content: none;
+    }
+
+    .#{$namespace}-select-dropdown__list
+      > .#{$namespace}-select-dropdown__item {
+      padding-left: 32px;
+    }
+
+    .#{$namespace}-select-tree-btn-group {
+      border-top: 1px solid getCssVar('border-color');
+      display: flex;
+      justify-content: space-between;
+      height: 32px;
+      position: sticky;
+      bottom: 0;
+      z-index: 10;
+      .#{$namespace}-select-tree-btn {
+        height: 100%;
+        width: 50%;
+        line-height: 32px;
+        cursor: pointer;
+        text-align: center;
+      }
+  
+      .#{$namespace}-select-tree-btn + .#{$namespace}-select-tree-btn {
+        border-left: 1px solid getCssVar('border-color');
+      }
+    }
+
+    .#{$namespace}-select-dropdown__item {
+      flex: 1;
+      background: transparent !important;
+
+      // padding-left move to `el-tree-node__expand-icon`
+      padding-left: 0;
+
+      // fix: select height > tree node height
+      // https://github.com/yujinpan/el-select-tree/pull/33
+      height: 20px;
+      line-height: 20px;
+    }
+  }
+}
